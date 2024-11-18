@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+  import React, { useState, useEffect } from "react";
+  import axios from "axios";
+  import MovieList from "./MovieList"; 
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+  function App() {
+    const [movies, setMovies] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-export default App;
+    useEffect(() => {
+      const fetchMovies = async () => {
+        try {
+          const response = await axios.get("https://dummyapi.online/api/movies");
+          console.log(response.data[0].image);
+          setMovies(response.data);
+        } catch (err) {
+          setError("Failed to fetch movies.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchMovies();
+    }, []);
+
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+
+    if (error) {
+      return <div>{error}</div>;
+    }
+
+    return (
+      <div className="App">
+        <h1>Movie List</h1>
+        <MovieList movies={movies} /> 
+      </div>
+    );
+  }
+
+  export default App;
